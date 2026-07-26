@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read The Defense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hardwood: #c9914f;
+    --hardwood-dark: #a8722f;
+    --court-navy: #101a2c;
+    --court-navy-2: #17233b;
+    --chalk: #f3ede0;
+    --hoop-orange: #e8562a;
+    --hoop-orange-dark: #c2431c;
+    --net-gray: #8b93a3;
+    --good: #3fa35a;
+    --bad: #d0452c;
+    --led: #ff5a36;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background: var(--court-navy);
+    background-image:
+      radial-gradient(ellipse at top, rgba(232,86,42,0.10), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+    color: var(--chalk);
+    font-family: 'Archivo', sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .wrap{ width:100%; max-width:760px; padding:20px 18px 60px; }
+
+  .brand{ display:flex; align-items:baseline; justify-content:space-between; margin:10px 0 22px; }
+  .brand h1{
+    font-family:'Teko', sans-serif; font-weight:700; letter-spacing:0.5px;
+    font-size:42px; margin:0; color:var(--chalk); line-height:0.9;
+  }
+  .brand h1 span{ color:var(--hoop-orange); }
+  .brand small{ font-family:'Space Mono', monospace; color:var(--net-gray); font-size:11px; letter-spacing:1px; text-transform:uppercase;}
+
+  .user-pill{
+    font-family:'Space Mono', monospace; font-size:12px; color:var(--net-gray);
+    border:1px solid rgba(255,255,255,0.12); padding:6px 12px; border-radius:20px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .user-pill b{ color:var(--chalk); }
+  .user-pill button{
+    background:none;border:none;color:var(--net-gray);cursor:pointer;font-family:inherit;font-size:11px;text-decoration:underline;padding:0;
+  }
+
+  .card{
+    background: linear-gradient(180deg, var(--court-navy-2), #121d31);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    padding:26px;
+    margin-bottom:18px;
+    box-shadow: 0 10px 30px -12px rgba(0,0,0,0.6);
+  }
+
+  .label{
+    font-family:'Space Mono', monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--hoop-orange); margin-bottom:8px; display:block;
+  }
+
+  input[type=text], input[type=number], select, textarea{
+    width:100%; background:#0b1424; border:1px solid rgba(255,255,255,0.14); color:var(--chalk);
+    padding:11px 12px; border-radius:8px; font-family:'Archivo',sans-serif; font-size:14px; margin-bottom:14px;
+  }
+  input::placeholder, textarea::placeholder{ color:#5b6478; }
+  input:focus, select:focus, textarea:focus{ outline:2px solid var(--hoop-orange); outline-offset:1px; }
+
+  .btn{
+    font-family:'Teko', sans-serif; font-weight:600; letter-spacing:0.5px;
+    background: var(--hoop-orange); color:#1a0d06; border:none; border-radius:9px;
+    padding:12px 20px; font-size:20px; cursor:pointer; line-height:1;
+    transition: transform .08s ease, background .15s ease;
+  }
+  .btn:hover{ background: var(--hoop-orange-dark); }
+  .btn:active{ transform: scale(0.98); }
+  .btn.ghost{
+    background:transparent; color:var(--chalk); border:1px solid rgba(255,255,255,0.25);
+  }
+  .btn.ghost:hover{ border-color: var(--hoop-orange); color:var(--hoop-orange); }
+  .btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  .tabs{ display:flex; gap:6px; margin-bottom:18px; }
+  .tab{
+    flex:1; text-align:center; padding:10px 8px; border-radius:8px; cursor:pointer;
+    font-family:'Teko', sans-serif; font-size:19px; letter-spacing:0.5px; color:var(--net-gray);
+    border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.02);
+  }
+  .tab.active{ background: var(--hoop-orange); color:#1a0d06; border-color:var(--hoop-orange); }
+
+  .jumbotron{
+    position:relative; border-radius:12px; overflow:hidden; background:#000;
+    border: 3px solid #2a3650; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.05);
+  }
+  .jumbotron iframe{ display:block; width:100%; aspect-ratio:16/9; border:none; pointer-events:none; }
+  #click-shield{ background:transparent; }
+
+  .shotclock{
+    position:absolute; top:10px; right:10px;
+    background:#000; border:2px solid var(--led); border-radius:6px;
+    font-family:'Space Mono', monospace; color:var(--led); font-size:22px; font-weight:700;
+    padding:3px 10px; letter-spacing:1px; text-shadow:0 0 8px rgba(255,90,54,0.7);
+    min-width:52px; text-align:center;
+  }
+
+  .situation{
+    margin-top:16px; padding:16px; background:rgba(232,86,42,0.08); border-left:3px solid var(--hoop-orange);
+    border-radius:0 8px 8px 0; font-size:14.5px; line-height:1.5; color:#e9e3d6;
+  }
+  .situation b{ color: var(--hoop-orange); }
+
+  .prompt{
+    font-family:'Teko', sans-serif; font-size:28px; font-weight:600; margin:18px 0 12px; color:var(--chalk);
+  }
+
+  .option{
+    display:flex; align-items:flex-start; gap:12px;
+    background:#0b1424; border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+    padding:14px 16px; margin-bottom:10px; cursor:pointer; text-align:left; width:100%;
+    font-family:'Archivo', sans-serif; font-size:15px; color:var(--chalk);
+    transition: border-color .12s ease, background .12s ease;
+  }
+  .option:hover{ border-color: var(--hoop-orange); }
+  .option .num{
+    font-family:'Teko', sans-serif; font-size:20px; color:var(--net-gray); min-width:22px;
+  }
+  .option.correct{ border-color: var(--good); background: rgba(63,163,90,0.12); }
+  .option.wrong{ border-color: var(--bad); background: rgba(208,69,44,0.12); }
+  .option:disabled{ cursor:default; }
+
+  .feedback{
+    margin-top:16px; padding:16px; border-radius:10px; font-size:14.5px; line-height:1.55;
+  }
+  .feedback.good{ background:rgba(63,163,90,0.12); border:1px solid var(--good); }
+  .feedback.bad{ background:rgba(208,69,44,0.12); border:1px solid var(--bad); }
+  .feedback .verdict{ font-family:'Teko',sans-serif; font-size:24px; margin-bottom:6px; }
+  .feedback.good .verdict{ color: var(--good); }
+  .feedback.bad .verdict{ color: var(--bad); }
+
+  .scorebar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Space Mono', monospace; font-size:12px; color:var(--net-gray); margin-bottom:14px;
+  }
+  .scorebar b{ color:var(--chalk); font-size:16px; }
+
+  table{ width:100%; border-collapse:collapse; }
+  th{ text-align:left; font-family:'Space Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--net-gray); padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.15); }
+  td{ padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:14.5px; }
+  tr.me{ background: rgba(232,86,42,0.1); }
+  .rank{ font-family:'Teko',sans-serif; font-size:20px; color:var(--hoop-orange); width:34px; }
+
+  .empty{ text-align:center; color:var(--net-gray); padding:30px 10px; font-size:14px; }
+  .field-help{ color:var(--net-gray); font-size:12px; margin:-8px 0 14px; }
+  .divider{ height:1px; background:rgba(255,255,255,0.08); margin:20px 0; }
+  h2.section{ font-family:'Teko',sans-serif; font-size:26px; margin:0 0 14px; color:var(--chalk); }
+  .notice{ font-size:12.5px; color:var(--net-gray); line-height:1.5; margin-top:10px; }
+  a{ color: var(--hoop-orange); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const app = document.getElementById('app');
+let state = {
+  screen: 'login',
+  username: null,
+  tab: 'play',
+  plays: [],
+  currentPlayIdx: null,
+  answered: false,
+  chosenIdx: null,
+  session: { correct: 0, total: 0 },
+  leaderboard: [],
+  loading: true,
+};
+
+// Real, publicly embeddable YouTube clips (coaching shorts), used under YouTube's
+// standard embed terms. Duration is an approximate watch-time estimate per clip —
+// the clip is never scrubbable, so exact frame timing isn't required; the game
+// reveals the question once the clip has had time to play out (or on manual reveal).
+const SEED_PLAYS = [
+  {
+    id: 'seed1',
+    title: 'Closeout: Catch and Shoot, or Drive?',
+    youtubeId: 'qEi0Sc_xj74',
+    duration: 30,
+    situation: "Ball gets driven and kicked out to you on the perimeter. A defender is closing out.",
+    prompt: 'The closeout is under control (not flying by you). What\'s the read?',
+    options: ['Shoot immediately off the catch', 'Drive it — closeout is tight enough to attack', 'Pump fake then reset the offense', 'Pass it right back'],
+    correctIdx: 0,
+    explanation: "A controlled, in-balance closeout still contests the catch-and-shoot but hasn't over-sprinted into your space. Against a slower/controlled closeout, the catch-and-shoot is the efficient read; you attack the closeout only once it's rushed or off-balance."
+  },
+  {
+    id: 'seed2',
+    title: 'Tight Closeout = Attack, Loose Closeout = Shoot',
+    youtubeId: 'DodveomyemI',
+    duration: 30,
+    situation: "Same catch-on-the-perimeter situation, but the defender flies at you off-balance, too close to contest a drive.",
+    prompt: 'The defender closes out too hard and is off-balance. What\'s the read?',
+    options: ['Shoot over the top anyway', 'Drive past them — a tight, off-balance closeout opens a driving lane', 'Swing the ball to the weak side', 'Call a timeout'],
+    correctIdx: 1,
+    explanation: "Tight/rushed closeout → attack it off the dribble, since the defender gave up the drive to contest the shot. Loose/under-control closeout → take the open shot instead."
+  },
+  {
+    id: 'seed3',
+    title: 'Attacking Closeout Defenders',
+    youtubeId: 'UJPIJSe8e-Q',
+    duration: 30,
+    situation: "You catch the ball on the wing as your defender scrambles to closeout from a rotation.",
+    prompt: 'Your defender is scrambling to close out from help position. What should you do first?',
+    options: ['Square up and shoot immediately no matter what', 'Read the closeout speed/balance before deciding to shoot or drive', 'Always drive, no exceptions', 'Pass to whoever is closest'],
+    correctIdx: 1,
+    explanation: "The skill here is reading the closeout itself — speed, angle, balance — before committing to shoot or drive, instead of defaulting to one option every time."
+  },
+  {
+    id: 'seed4',
+    title: 'Shoot or Drive? (The Common Mistake)',
+    youtubeId: 'mzLo84Rpsuo',
+    duration: 25,
+    situation: "A shooter catches the ball with a defender closing out from one pass away.",
+    prompt: 'What mistake do most players make in this exact spot?',
+    options: ["They shoot too early before checking the closeout", "They drive even when the closeout is under control and a hand is down", "They pass up an open shot to force a drive into help", "They travel"],
+    correctIdx: 2,
+    explanation: "The common mistake: over-driving into a set defense/help when the closeout was actually loose enough to just shoot — turning a good shot into a tough, contested drive."
+  },
+  {
+    id: 'seed5',
+    title: 'Cutting Backdoor vs. an Overplaying Defender',
+    youtubeId: 'xQxLSFoszEM',
+    duration: 25,
+    situation: "You're on the wing and your defender is overplaying the passing lane, denying the catch.",
+    prompt: 'Your defender denies the pass by overplaying the lane. What\'s the read?',
+    options: ['Cut backdoor toward the basket for the lob/bounce pass', 'Stand still and wait for the defender to back off', 'Wave for the ball anyway', 'Run to the opposite corner'],
+    correctIdx: 0,
+    explanation: "A defender who overplays/denies the passing lane has taken away the catch on that side, but leaves the basket side open — the backdoor cut punishes exactly that positioning."
+  },
+  {
+    id: 'seed6',
+    title: 'What Is a Backdoor Cut?',
+    youtubeId: 'tmrtpJL9KpE',
+    duration: 25,
+    situation: "Conceptual breakdown of the backdoor cut as a counter to denial defense.",
+    prompt: 'A backdoor cut is specifically the counter to which defensive action?',
+    options: ['A double team on the ball', 'A defender denying/overplaying the passing lane', 'A zone defense', 'A full-court press'],
+    correctIdx: 1,
+    explanation: "The backdoor cut exists to punish a defender who plays too far up in the passing lane trying to deny the catch — the cutter goes behind them to the rim instead of fighting for the catch out front."
+  },
+  {
+    id: 'seed7',
+    title: 'Defense Shooting the Gap',
+    youtubeId: 'yP4aVR5RbxE',
+    duration: 30,
+    situation: "Coming off a pindown screen, your defender cheats and 'shoots the gap' — jumping the passing lane early instead of trailing over the top.",
+    prompt: "Your defender shoots the gap on a pindown and the corner is open. What's the read?",
+    options: ['Force the catch anyway through the defender', 'Skip/reverse the ball to the open corner', 'Cut to the block', 'Reset to half court'],
+    correctIdx: 1,
+    explanation: "When a defender jumps the gap to deny one side, they leave the opposite side (often the corner) open — the read is to get the ball there rather than force a pass into the denial."
+  },
+  {
+    id: 'seed8',
+    title: 'Help Defense Rotation: "Sink"',
+    youtubeId: 'GCLHVFGLVrg',
+    duration: 30,
+    situation: "On defense: the ball gets driven into the paint and your teammate needs low help. This clip shows the 'sink' rotation concept.",
+    prompt: "As the help-side defender when the ball is driven baseline, what does a proper 'sink' rotation require?",
+    options: ["Stay locked on your own man no matter what", "Sink down to help at the rim, then recover out to your man if the ball kicks out", "Leave the court entirely", "Double the ball on the perimeter"],
+    correctIdx: 1,
+    explanation: "'Sink' rotations mean help-side defenders drop toward the paint to protect the rim against the drive, then scramble back out to shooters if the ball is kicked — a stopgap, not a permanent switch."
+  }
+];
+
+function loadFromStorage(cb){
+  Promise.resolve(window.storage && window.storage.get('plays-list', true))
+    .then(res=>{
+      state.plays = (res && res.value) ? JSON.parse(res.value) : SEED_PLAYS;
+    })
+    .catch(()=>{ state.plays = SEED_PLAYS; })
+    .then(()=> refreshLeaderboard())
+    .then(()=>{ state.loading=false; render(); if(cb) cb(); });
+}
+
+function savePlays(){
+  return window.storage.set('plays-list', JSON.stringify(state.plays), true).catch(()=>{});
+}
+
+function refreshLeaderboard(){
+  return Promise.resolve(window.storage && window.storage.list('profile:', true))
+    .then(async (res)=>{
+      const keys = (res && res.keys) ? res.keys : [];
+      const entries = [];
+      for(const k of keys){
+        try{
+          const r = await window.storage.get(k, true);
+          if(r && r.value) entries.push(JSON.parse(r.value));
+        }catch(e){}
+      }
+      entries.sort((a,b)=> (b.totalScore||0) - (a.totalScore||0));
+      state.leaderboard = entries;
+    })
+    .catch(()=>{ state.leaderboard = []; });
+}
+
+function getProfile(username){
+  return window.storage.get('profile:'+username, true)
+    .then(r=> r && r.value ? JSON.parse(r.value) : { username, totalScore:0, gamesPlayed:0, correct:0, attempts:0, bestStreak:0 })
+    .catch(()=> ({ username, totalScore:0, gamesPlayed:0, correct:0, attempts:0, bestStreak:0 }));
+}
+
+function saveProfile(profile){
+  return window.storage.set('profile:'+profile.username, JSON.stringify(profile), true).catch(()=>{});
+}
+
+function login(username){
+  username = username.trim();
+  if(!username) return;
+  state.username = username;
+  state.screen = 'main';
+  getProfile(username).then(p=>{
+    state.profile = p;
+    render();
+  });
+}
+
+function logout(){
+  state.username = null;
+  state.profile = null;
+  state.screen = 'login';
+  state.session = { correct:0, total:0 };
+  render();
+}
+
+let clockTimer = null;
+
+function startPlay(idx){
+  state.currentPlayIdx = idx;
+  state.answered = false;
+  state.chosenIdx = null;
+  state.screen = 'game';
+  state.clipToken = Date.now(); // cache-buster so "watch again" restarts cleanly
+  render();
+  runClock();
+}
+
+function runClock(){
+  if(clockTimer) clearInterval(clockTimer);
+  const play = state.plays[state.currentPlayIdx];
+  const duration = Math.max(3, play.duration || 20);
+  let remaining = duration;
+  const clockEl = document.getElementById('shotclock');
+  if(clockEl) clockEl.textContent = String(remaining).padStart(2,'0');
+  clockTimer = setInterval(()=>{
+    remaining -= 1;
+    const el = document.getElementById('shotclock');
+    if(el) el.textContent = String(Math.max(0, remaining)).padStart(2,'0');
+    if(remaining <= 0){
+      clearInterval(clockTimer);
+      revealQuestion();
+    }
+  }, 1000);
+}
+
+function replayClip(){
+  state.clipToken = Date.now();
+  const iframe = document.getElementById('clip-frame');
+  if(iframe) iframe.src = buildEmbedSrc(state.plays[state.currentPlayIdx], state.clipToken);
+  runClock();
+  const q = document.getElementById('question-block');
+  if(q) q.style.display = 'none';
+}
+
+function buildEmbedSrc(play, token){
+  return `https://www.youtube.com/embed/${encodeURIComponent(play.youtubeId)}`
+    + `?autoplay=1&mute=0&controls=0&disablekb=1&fs=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&t=${token}`;
+}
+
+function revealQuestion(){
+  if(clockTimer) clearInterval(clockTimer);
+  const el = document.getElementById('question-block');
+  if(el) el.style.display = 'block';
+  const btn = document.getElementById('reveal-early-btn');
+  if(btn) btn.style.display = 'none';
+}
+
+function choose(idx){
+  if(state.answered) return;
+  state.answered = true;
+  state.chosenIdx = idx;
+  const play = state.plays[state.currentPlayIdx];
+  const isCorrect = idx === play.correctIdx;
+  state.session.total += 1;
+  if(isCorrect) state.session.correct += 1;
+
+  state.profile.attempts = (state.profile.attempts||0) + 1;
+  if(isCorrect){
+    state.profile.correct = (state.profile.correct||0) + 1;
+    state.profile.totalScore = (state.profile.totalScore||0) + 100;
+  }
+  state.profile.gamesPlayed = (state.profile.gamesPlayed||0) + 1;
+  saveProfile(state.profile).then(()=> refreshLeaderboard()).then(render);
+  render();
+}
+
+function nextPlay(){
+  const nextIdx = (state.currentPlayIdx + 1) % state.plays.length;
+  startPlay(nextIdx);
+}
+
+function addPlay(data){
+  state.plays.push({
+    id: 'p'+Date.now(),
+    title: data.title,
+    youtubeId: data.youtubeId,
+    duration: parseInt(data.duration,10) || 20,
+    situation: data.situation,
+    prompt: data.prompt,
+    options: data.options,
+    correctIdx: parseInt(data.correctIdx,10),
+    explanation: data.explanation,
+  });
+  savePlays().then(()=>{ state.tab='play'; render(); });
+}
+
+// ---------- RENDER ----------
+function render(){
+  if(state.loading){
+    app.innerHTML = `<div class="wrap"><div class="empty">Loading the gym...</div></div>`;
+    return;
+  }
+  if(state.screen === 'login'){ renderLogin(); return; }
+  if(state.screen === 'game'){ renderGame(); return; }
+  renderMain();
+}
+
+function renderLogin(){
+  app.innerHTML = `
+    <div class="brand" style="justify-content:center; margin-bottom:6px;">
+      <h1>READ THE <span>DEFENSE</span></h1>
+    </div>
+    <p style="text-align:center; color:var(--net-gray); font-size:13.5px; margin-top:0;">Watch the possession. When it freezes, make the read.</p>
+    <div class="card" style="max-width:380px; margin:24px auto 0;">
+      <span class="label">Enter your name</span>
+      <input id="login-input" type="text" placeholder="e.g. CoachTay" maxlength="24" />
+      <button class="btn" style="width:100%;" onclick="handleLogin()">Take the court →</button>
+      <div class="notice">No password — this just tags your scores on the shared leaderboard, which any player using this app can see.</div>
+    </div>
+  `;
+  const input = document.getElementById('login-input');
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') handleLogin(); });
+  input.focus();
+}
+
+function handleLogin(){
+  const v = document.getElementById('login-input').value;
+  login(v);
+}
+
+function renderMain(){
+  const p = state.profile || {totalScore:0, correct:0, attempts:0};
+  const acc = p.attempts ? Math.round((p.correct/p.attempts)*100) : 0;
+
+  app.innerHTML = `
+    <div class="brand">
+      <h1>READ THE <span>DEFENSE</span></h1>
+      <div class="user-pill"><b>${escapeHtml(state.username)}</b> · ${p.totalScore||0} pts <button onclick="logout()">switch</button></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab ${state.tab==='play'?'active':''}" onclick="setTab('play')">PLAY</div>
+      <div class="tab ${state.tab==='add'?'active':''}" onclick="setTab('add')">ADD A CLIP</div>
+      <div class="tab ${state.tab==='board'?'active':''}" onclick="setTab('board')">LEADERBOARD</div>
+    </div>
+
+    <div id="tab-content"></div>
+  `;
+  const content = document.getElementById('tab-content');
+  if(state.tab==='play') content.innerHTML = renderPlayList(p, acc);
+  if(state.tab==='add') content.innerHTML = renderAddForm();
+  if(state.tab==='board') content.innerHTML = renderLeaderboard();
+  if(state.tab==='add') wireAddForm();
+}
+
+function renderPlayList(p, acc){
+  if(!state.plays.length){
+    return `<div class="card"><div class="empty">No clips yet. Add one in the "Add a Clip" tab.</div></div>`;
+  }
+  const rows = state.plays.map((play, i)=> `
+    <div class="card" style="padding:18px 20px; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-family:'Teko',sans-serif; font-size:20px;">${escapeHtml(play.title)}</div>
+        <div style="color:var(--net-gray); font-size:12.5px;">~${play.duration||20}s clip</div>
+      </div>
+      <button class="btn" onclick="startPlay(${i})">Run it ▶</button>
+    </div>
+  `).join('');
+  return `
+    <div class="scorebar">
+      <span>SESSION: <b>${state.session.correct}/${state.session.total}</b></span>
+      <span>CAREER ACCURACY: <b>${acc}%</b></span>
+    </div>
+    ${rows}
+  `;
+}
+
+function renderAddForm(){
+  return `
+    <div class="card">
+      <h2 class="section">Add a clip</h2>
+      <div class="notice" style="margin-bottom:16px;">
+        Use the YouTube video ID from a clip you have rights to embed (an official highlight/breakdown upload, etc.) —
+        e.g. for <code>youtube.com/watch?v=abc123XYZ</code> the ID is <code>abc123XYZ</code>. The clip plays start to
+        finish with no pause/scrub controls; set an approximate length so the question reveals right after.
+      </div>
+      <span class="label">Clip title</span>
+      <input id="f-title" type="text" placeholder="e.g. Wolves PnR, 3rd Q vs Nuggets" />
+
+      <span class="label">YouTube video ID</span>
+      <input id="f-yt" type="text" placeholder="abc123XYZ" />
+      <div class="field-help" style="margin-top:-10px;">The whole clip plays start to finish — players can't pause or scrub it, only watch (and rewatch).</div>
+
+      <span class="label">Approx. clip length (seconds)</span>
+      <input id="f-duration" type="number" min="3" placeholder="25" />
+      <div class="field-help" style="margin-top:-10px;">Roughly how long the clip runs — the question reveals once this much time has passed.</div>
+
+      <span class="label">Describe the situation</span>
+      <textarea id="f-situation" rows="3" placeholder="What is the defense doing in this clip? Who's guarding whom, who's helping, where's the gap..."></textarea>
+
+      <span class="label">Question</span>
+      <input id="f-prompt" type="text" placeholder="e.g. What should the ball-handler do?" />
+
+      <span class="label">Options (one per line, 2-4)</span>
+      <textarea id="f-options" rows="4" placeholder="Pull up for the jumper&#10;Hit the roller&#10;Kick to the corner&#10;Drive baseline"></textarea>
+
+      <span class="label">Correct option number (1-based)</span>
+      <input id="f-correct" type="number" min="1" placeholder="3" />
+
+      <span class="label">Explanation (shown after answering)</span>
+      <textarea id="f-explanation" rows="3" placeholder="Why that read is correct given exactly what the defense showed."></textarea>
+
+      <button class="btn" onclick="submitAddForm()">Save clip</button>
+    </div>
+  `;
+}
+
+function wireAddForm(){}
+
+function submitAddForm(){
+  const title = document.getElementById('f-title').value.trim();
+  const youtubeId = document.getElementById('f-yt').value.trim();
+  const duration = document.getElementById('f-duration').value;
+  const situation = document.getElementById('f-situation').value.trim();
+  const prompt = document.getElementById('f-prompt').value.trim();
+  const options = document.getElementById('f-options').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const correctIdx = parseInt(document.getElementById('f-correct').value,10) - 1;
+  const explanation = document.getElementById('f-explanation').value.trim();
+
+  if(!title || !youtubeId || !prompt || options.length<2 || isNaN(correctIdx) || correctIdx<0 || correctIdx>=options.length){
+    alert('Please fill in a title, YouTube ID, question, at least 2 options, and a valid correct option number.');
+    return;
+  }
+  addPlay({title, youtubeId, duration, situation, prompt, options, correctIdx, explanation});
+}
+
+function renderLeaderboard(){
+  if(!state.leaderboard.length){
+    return `<div class="card"><div class="empty">No scores yet — be the first on the board.</div></div>`;
+  }
+  const rows = state.leaderboard.map((e,i)=> `
+    <tr class="${e.username===state.username?'me':''}">
+      <td class="rank">${i+1}</td>
+      <td>${escapeHtml(e.username)}</td>
+      <td>${e.totalScore||0}</td>
+      <td>${e.attempts ? Math.round((e.correct/e.attempts)*100)+'%' : '—'}</td>
+    </tr>
+  `).join('');
+  return `
+    <div class="card">
+      <h2 class="section">Leaderboard</h2>
+      <table>
+        <thead><tr><th></th><th>Player</th><th>Score</th><th>Accuracy</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function setTab(t){ state.tab = t; render(); }
+
+function renderGame(){
+  const play = state.plays[state.currentPlayIdx];
+  const src = buildEmbedSrc(play, state.clipToken);
+
+  app.innerHTML = `
+    <div class="brand">
+      <h1 style="font-size:30px;">READ THE <span>DEFENSE</span></h1>
+      <div class="user-pill"><b>${escapeHtml(state.username)}</b> · ${(state.profile&&state.profile.totalScore)||0} pts</div>
+    </div>
+    <div class="card">
+      <div style="font-family:'Teko',sans-serif; font-size:20px; margin-bottom:10px; color:var(--net-gray);">${escapeHtml(play.title)}</div>
+      <div class="jumbotron" style="position:relative;">
+        <iframe id="clip-frame" src="${src}" allow="autoplay; encrypted-media" tabindex="-1"></iframe>
+        <div id="click-shield" style="position:absolute; inset:0; cursor:default;" title="Playback only — watch it through, no pausing"></div>
+        <div class="shotclock" id="shotclock">--</div>
+      </div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn ghost" onclick="replayClip()">↻ Watch it again</button>
+        <button class="btn ghost" id="reveal-early-btn" onclick="revealQuestion()">Show me the read now →</button>
+      </div>
+
+      <div id="question-block" style="display:none;">
+        <div class="situation"><b>ON FILM:</b> ${escapeHtml(play.situation||'')}</div>
+        <div class="prompt">${escapeHtml(play.prompt)}</div>
+        <div id="options-block">
+          ${play.options.map((opt,i)=>`
+            <button class="option" id="opt-${i}" onclick="choose(${i})">
+              <span class="num">${i+1}</span><span>${escapeHtml(opt)}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div id="feedback-block"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="backToMenu()">← Back to menu</button>
+    </div>
+  `;
+
+  if(state.answered){
+    revealQuestion();
+    markAnswered(play);
+  }
+}
+
+function markAnswered(play){
+  play.options.forEach((opt,i)=>{
+    const btn = document.getElementById('opt-'+i);
+    if(!btn) return;
+    btn.disabled = true;
+    if(i===play.correctIdx) btn.classList.add('correct');
+    else if(i===state.chosenIdx) btn.classList.add('wrong');
+  });
+  const isCorrect = state.chosenIdx === play.correctIdx;
+  const fb = document.getElementById('feedback-block');
+  if(fb){
+    fb.innerHTML = `
+      <div class="feedback ${isCorrect?'good':'bad'}">
+        <div class="verdict">${isCorrect ? 'BUCKET. Correct read.' : 'MISSED READ.'}</div>
+        <div>${escapeHtml(play.explanation||'')}</div>
+      </div>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn" onclick="nextPlay()">Next possession →</button>
+        <button class="btn ghost" onclick="backToMenu()">Back to menu</button>
+      </div>
+    `;
+  }
+}
+
+function backToMenu(){
+  state.screen = 'main';
+  state.tab = 'play';
+  render();
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// wrap choose to re-render feedback in-place instead of full re-render (keeps iframe from reloading)
+const _choose = choose;
+choose = function(idx){
+  if(state.answered) return;
+  state.answered = true;
+  state.chosenIdx = idx;
+  const play = state.plays[state.currentPlayIdx];
+  const isCorrect = idx === play.correctIdx;
+  state.session.total += 1;
+  if(isCorrect) state.session.correct += 1;
+  state.profile.attempts = (state.profile.attempts||0) + 1;
+  if(isCorrect){
+    state.profile.correct = (state.profile.correct||0) + 1;
+    state.profile.totalScore = (state.profile.totalScore||0) + 100;
+  }
+  state.profile.gamesPlayed = (state.profile.gamesPlayed||0) + 1;
+  markAnswered(play);
+  saveProfile(state.profile).then(()=> refreshLeaderboard());
+};
+
+loadFromStorage();
+</script>
+</body>
+</html>
